@@ -283,7 +283,6 @@ endfunction
 
 
 function! lightline#colorscheme#base16ext#init() abort
-  verbose echom 'called  lightline#colorscheme#base16ext#init()'
   if !exists('g:base16_gui01')
     echoerr 'g:base16_gui01 not defined'
     return

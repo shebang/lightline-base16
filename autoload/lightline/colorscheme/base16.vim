@@ -1,5 +1,5 @@
 " =============================================================================
-" Filename: autoload/lightline/colorscheme/base16ext.vim
+" Filename: autoload/lightline/colorscheme/base16.vim
 " Author: shebang
 " Author: itchyny
 " License: MIT License
@@ -22,26 +22,26 @@
 " base0E - Keywords, Storage, Selector, Markup Italic, Diff Changed
 " base0F - Deprecated, Opening/Closing Embedded Language Tags, e.g. <?php ?>
 
+
 function! s:base16_color(default, source) abort
   let new_color = a:default
   for func_def in a:source
     let func = 'color#' . func_def[0]
     let new_color = call(func, [ new_color ] + func_def[1])
   endfor
-  let new_color = '#'.substitute(new_color, '#', '', 'g')
-  return new_color
+  return '#'.substitute(new_color, '#', '', 'g')
 endfunction
 
 
 function! s:compile_palette(palette) abort
 
-  let s:p = {}
+  let s:base16_palette = {}
   for [mode, mode_palette] in items(a:palette)
-    let s:p[mode] = {}
+    let s:base16_palette[mode] = {}
 
     let pos = ['left', 'middle', 'right']
     for pos in keys(mode_palette)
-      let s:p[mode][pos] = []
+      let s:base16_palette[mode][pos] = []
     endfor
 
     for [pos, pos_palette] in items(mode_palette)
@@ -49,12 +49,12 @@ function! s:compile_palette(palette) abort
         if has_key(color_pair[0], 'color') && has_key(color_pair[1], 'color')
           let color_fg = s:base16_color(color_pair[0]['color'], color_pair[0]['transform'])
           let color_bg = s:base16_color(color_pair[1]['color'], color_pair[1]['transform'])
-          let s:p[mode][pos] = add(s:p[mode][pos],[ color_fg, color_bg ] )
+          let s:base16_palette[mode][pos] = add(s:base16_palette[mode][pos],[ color_fg, color_bg ] )
         endif
       endfor
     endfor
   endfor
-  return s:p
+  return s:base16_palette
 endfunction
 
 function! s:create_palette() abort
@@ -67,8 +67,18 @@ function! s:create_palette() abort
   let testfile_fg = g:base16_gui00
   let testfile_bg = g:base16_gui0D
 
-  let base16ext = {}
-  let base16ext.normal = {
+  let success_fg = g:base16_gui00
+  let success_bg = g:base16_gui08
+  let warning_fg = g:base16_gui00
+  let warning_bg = g:base16_gui0D
+  let error_fg = g:base16_gui00
+  let error_bg = g:base16_gui0F
+
+
+  let s:base16_palette = {}
+
+  let base16 = {}
+  let base16.normal = {
     \ 'left': [
       \ [ { 'color': '#'.g:base16_gui04, 'transform': [ ['darken', [0]] ] },
         \ { 'color': '#'.g:base16_gui03, 'transform': [ ['darken', [20]] ] }],
@@ -94,16 +104,16 @@ function! s:create_palette() abort
         \ { 'color': '#'.g:base16_gui01, 'transform': [ ['lighten', [70]] ] }],
     \ ],
     \ 'success': [
-      \ [ { 'color': '#'.g:base16_gui00, 'transform': [ ['darken', [0]] ] },
-        \ { 'color': '#'.g:base16_gui12, 'transform': [ ['lighten', [0]] ] }],
+      \ [ { 'color': '#'.success_fg, 'transform': [ ['darken', [0]] ] },
+        \ { 'color': '#'.success_bg, 'transform': [ ['lighten', [0]] ] }],
     \ ],
     \ 'warning': [
-      \ [ { 'color': '#'.g:base16_gui00, 'transform': [ ['darken', [0]] ] },
-        \ { 'color': '#'.g:base16_gui11, 'transform': [ ['lighten', [0]] ] }],
+      \ [ { 'color': '#'.warning_fg, 'transform': [ ['darken', [0]] ] },
+        \ { 'color': '#'.warning_bg, 'transform': [ ['lighten', [0]] ] }],
     \ ],
     \ 'error': [
-      \ [ { 'color': '#'.g:base16_gui00, 'transform': [ ['darken', [0]] ] },
-        \ { 'color': '#'.g:base16_gui10, 'transform': [ ['lighten', [0]] ] }],
+      \ [ { 'color': '#'.error_fg, 'transform': [ ['darken', [0]] ] },
+        \ { 'color': '#'.error_bg, 'transform': [ ['lighten', [0]] ] }],
     \ ],
     \ 'testfile': [
       \ [ { 'color': '#'.testfile_fg, 'transform': [ ['darken', [0]] ] },
@@ -114,7 +124,7 @@ function! s:create_palette() abort
         \ { 'color': '#'.g:base16_gui01, 'transform': [ ['lighten', [70]] ] }],
     \ ],
   \ }
-  let base16ext.tabline = {
+  let base16.tabline = {
     \ 'tabsel': [
       \ [ { 'color': '#'.g:base16_gui04, 'transform': [ ['darken', [0]] ] },
         \ { 'color': '#'.g:base16_gui02, 'transform': [ ['lighten', [0]] ] }],
@@ -148,7 +158,7 @@ function! s:create_palette() abort
         \ { 'color': '#'.g:base16_gui01, 'transform': [ ['lighten', [0]] ] }],
     \ ],
   \ }
-   let base16ext.inactive = {
+   let base16.inactive = {
     \ 'left': [
       \ [ { 'color': '#'.g:base16_gui04, 'transform': [ ['darken', [30]] ] },
         \ { 'color': '#'.g:base16_gui01, 'transform': [ ['darken', [50]] ] }],
@@ -174,7 +184,7 @@ function! s:create_palette() abort
         \ { 'color': '#'.g:base16_gui01, 'transform': [ ['darken', [50]] ] }],
     \ ],
   \ }
-  let base16ext.visual = {
+  let base16.visual = {
     \ 'left': [
       \ [ { 'color': '#'.visual_fg, 'transform': [ ['darken', [0]] ] },
         \ { 'color': '#'.visual_bg, 'transform': [ ['lighten', [10]] ] }],
@@ -208,7 +218,7 @@ function! s:create_palette() abort
         \ { 'color': '#'.visual_bg, 'transform': [ ['darken', [30]] ] }],
     \ ],
   \ }
-  let base16ext.insert = {
+  let base16.insert = {
     \ 'left': [
       \ [ { 'color': '#'.insert_fg, 'transform': [ ['darken', [0]] ] },
         \ { 'color': '#'.insert_bg, 'transform': [ ['lighten', [10]] ] }],
@@ -242,7 +252,7 @@ function! s:create_palette() abort
         \ { 'color': '#'.insert_bg, 'transform': [ ['darken', [30]] ] }],
     \ ],
   \ }
-  let base16ext.replace = {
+  let base16.replace = {
     \ 'left': [
       \ [ { 'color': '#'.replace_fg, 'transform': [ ['darken', [0]] ] },
         \ { 'color': '#'.replace_bg, 'transform': [ ['lighten', [10]] ] }],
@@ -277,21 +287,27 @@ function! s:create_palette() abort
     \ ],
   \ }
 
-  let g:lightline#colorscheme#base16ext#palette = lightline#colorscheme#fill(s:compile_palette(base16ext))
+  let s:base16_palette = s:compile_palette( base16 )
 
 endfunction
 
+function! lightline#colorscheme#base16#_palette() abort
+  if !exists('s:base16_palette')
+    call s:create_palette()
+  endif
+  return s:base16_palette
+endfunction
 
-function! lightline#colorscheme#base16ext#init() abort
+function! lightline#colorscheme#base16#init() abort
   if !exists('g:base16_gui01')
     echoerr 'g:base16_gui01 not defined'
     return
   endif
+  let g:lightline#colorscheme#base16#palette = lightline#colorscheme#fill(lightline#colorscheme#base16#_palette())
 
-  call s:create_palette()
 endfunction
 
 
-call lightline#colorscheme#base16ext#init()
+call lightline#colorscheme#base16#init()
 
 
